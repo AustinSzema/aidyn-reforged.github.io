@@ -1,0 +1,1695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YarnSpinner Unity Commands Reference</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Syne:wght@400;600;700;800&display=swap');
+
+  :root {
+    --bg: #0f1117;
+    --surface: #161b27;
+    --surface2: #1d2436;
+    --border: #2a3349;
+    --accent: #7c6af7;
+    --accent2: #4fd1c5;
+    --accent3: #f6ad55;
+    --accent4: #fc8181;
+    --text: #e8eaf0;
+    --text-muted: #8892a4;
+    --text-dim: #4a5568;
+    --cam: #7c6af7;
+    --var: #4fd1c5;
+    --other: #f6ad55;
+    --deprecated: #4a5568;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Syne', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 2.5rem 3rem 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(124,106,247,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .header-badge {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    border: 1px solid rgba(124,106,247,0.4);
+    border-radius: 4px;
+    padding: 3px 10px;
+    margin-bottom: 1rem;
+    letter-spacing: 0.08em;
+  }
+  .header h1 {
+    font-size: 2.4rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+    margin-bottom: 0.5rem;
+  }
+  .header h1 span { color: var(--accent); }
+  .header p {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    max-width: 600px;
+  }
+
+  /* LAYOUT */
+  .layout {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    min-height: calc(100vh - 160px);
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    border-right: 1px solid var(--border);
+    padding: 1.5rem 0;
+    position: sticky;
+    top: 0;
+    height: calc(100vh - 160px);
+    overflow-y: auto;
+  }
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-track { background: transparent; }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .nav-section {
+    margin-bottom: 0.5rem;
+  }
+  .nav-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: var(--text-dim);
+    padding: 0.75rem 1.5rem 0.25rem;
+    text-transform: uppercase;
+  }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0.4rem 1.5rem;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    border-left: 2px solid transparent;
+    text-decoration: none;
+  }
+  .nav-item:hover { color: var(--text); background: rgba(255,255,255,0.03); }
+  .nav-item.active {
+    color: var(--accent);
+    border-left-color: var(--accent);
+    background: rgba(124,106,247,0.08);
+  }
+  .nav-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* MAIN CONTENT */
+  .main {
+    padding: 2rem 3rem;
+    max-width: 900px;
+  }
+
+  /* FILTER BAR */
+  .filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+  }
+  .filter-btn {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 5px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 0.04em;
+  }
+  .filter-btn:hover { border-color: var(--text-muted); color: var(--text); }
+  .filter-btn.active-cam { border-color: var(--cam); color: var(--cam); background: rgba(124,106,247,0.1); }
+  .filter-btn.active-var { border-color: var(--var); color: var(--var); background: rgba(79,209,197,0.1); }
+  .filter-btn.active-other { border-color: var(--other); color: var(--other); background: rgba(246,173,85,0.1); }
+  .filter-btn.active-all { border-color: var(--text); color: var(--text); background: rgba(255,255,255,0.06); }
+
+  /* SECTION */
+  .section { margin-bottom: 3rem; }
+  .section-title {
+    font-size: 0.7rem;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-title span {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 10px;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+  .badge-cam { background: rgba(124,106,247,0.15); color: var(--cam); }
+  .badge-var { background: rgba(79,209,197,0.15); color: var(--var); }
+  .badge-other { background: rgba(246,173,85,0.15); color: var(--other); }
+
+  /* COMMAND CARD */
+  .cmd-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 12px;
+    overflow: hidden;
+    transition: border-color 0.15s;
+  }
+  .cmd-card:hover { border-color: rgba(255,255,255,0.12); }
+
+  .cmd-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 1rem 1.25rem 0.75rem;
+    cursor: pointer;
+    gap: 1rem;
+  }
+  .cmd-header-left { flex: 1; min-width: 0; }
+
+  .cmd-signature {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.88rem;
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+  .cmd-name { color: #fff; }
+  .cmd-param { color: var(--accent3); }
+  .cmd-desc {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  .cmd-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+  .return-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 3px;
+    border: 1px solid;
+    white-space: nowrap;
+  }
+  .return-int { color: var(--accent); border-color: rgba(124,106,247,0.4); background: rgba(124,106,247,0.08); }
+  .return-bool { color: var(--var); border-color: rgba(79,209,197,0.4); background: rgba(79,209,197,0.08); }
+  .return-void { color: var(--text-dim); border-color: var(--border); }
+
+  .cmd-body {
+    display: none;
+    padding: 0 1.25rem 1rem;
+    border-top: 1px solid var(--border);
+  }
+  .cmd-body.open { display: block; }
+
+  .cmd-body-inner {
+    padding-top: 1rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  .cmd-body-inner.full { grid-template-columns: 1fr; }
+
+  .detail-block h4 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 8px;
+  }
+
+  .code-block {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    color: #a8b4cc;
+    line-height: 1.7;
+    white-space: pre;
+    overflow-x: auto;
+  }
+  .code-block .kw { color: var(--accent); }
+  .code-block .fn { color: #68d391; }
+  .code-block .param { color: var(--accent3); }
+  .code-block .comment { color: var(--text-dim); }
+  .code-block .str { color: #fc8181; }
+
+  .note-block {
+    background: rgba(246,173,85,0.06);
+    border-left: 2px solid var(--accent3);
+    padding: 0.6rem 0.75rem;
+    border-radius: 0 4px 4px 0;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+
+  .chevron {
+    color: var(--text-dim);
+    font-size: 12px;
+    margin-top: 2px;
+    transition: transform 0.2s;
+    flex-shrink: 0;
+  }
+  .chevron.open { transform: rotate(90deg); }
+
+  /* SEARCH */
+  .search-wrap {
+    margin-bottom: 1.5rem;
+    position: relative;
+  }
+  .search-wrap input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.6rem 1rem 0.6rem 2.5rem;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .search-wrap input:focus { border-color: var(--accent); }
+  .search-wrap input::placeholder { color: var(--text-dim); }
+  .search-icon {
+    position: absolute;
+    left: 0.8rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-dim);
+    font-size: 14px;
+  }
+
+  /* DEPRECATED NOTE */
+  .deprecated-note {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+  }
+  .deprecated-note strong { color: var(--accent4); }
+
+  .empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--text-dim);
+    font-size: 0.85rem;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-badge">YarnSpinner · Unity · Command Reference</div>
+  <h1>Dialog <span>Commands</span></h1>
+  <p>Complete reference for all custom commands. Click any command to expand its Unity C# implementation and usage example.</p>
+</div>
+
+<div class="layout">
+  <nav class="sidebar">
+    <div class="nav-section">
+      <div class="nav-label">Camera</div>
+      <a class="nav-item active" href="#camera" onclick="scrollTo('camera')">
+        <span class="nav-dot" style="background:var(--cam)"></span>Pre-Commands
+      </a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Variables</div>
+      <a class="nav-item" href="#variables" onclick="scrollTo('variables')">
+        <span class="nav-dot" style="background:var(--var)"></span>Retrieval
+      </a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Game Flow</div>
+      <a class="nav-item" href="#flow" onclick="scrollTo('flow')">
+        <span class="nav-dot" style="background:var(--other)"></span>Flow & State
+      </a>
+      <a class="nav-item" href="#inventory" onclick="scrollTo('inventory')">
+        <span class="nav-dot" style="background:var(--other)"></span>Inventory & Gold
+      </a>
+      <a class="nav-item" href="#movement" onclick="scrollTo('movement')">
+        <span class="nav-dot" style="background:var(--other)"></span>Movement & Anim
+      </a>
+      <a class="nav-item" href="#modes" onclick="scrollTo('modes')">
+        <span class="nav-dot" style="background:var(--other)"></span>Mode Switches
+      </a>
+      <a class="nav-item" href="#party" onclick="scrollTo('party')">
+        <span class="nav-dot" style="background:var(--other)"></span>Party
+      </a>
+      <a class="nav-item" href="#scene" onclick="scrollTo('scene')">
+        <span class="nav-dot" style="background:var(--other)"></span>Scene Setup
+      </a>
+      <a class="nav-item" href="#misc" onclick="scrollTo('misc')">
+        <span class="nav-dot" style="background:var(--other)"></span>Misc
+      </a>
+    </div>
+  </nav>
+
+  <main class="main">
+
+    <div class="search-wrap">
+      <span class="search-icon">⌕</span>
+      <input type="text" id="search" placeholder="Search commands..." oninput="filterSearch(this.value)">
+    </div>
+
+    <div class="filter-bar">
+      <button class="filter-btn active-all" onclick="setFilter('all', this)">All</button>
+      <button class="filter-btn" onclick="setFilter('camera', this)">Camera</button>
+      <button class="filter-btn" onclick="setFilter('variable', this)">Variables</button>
+      <button class="filter-btn" onclick="setFilter('other', this)">Game Flow</button>
+    </div>
+
+    <!-- ═══════════════════════════════════════ CAMERA ═══ -->
+    <div class="section" id="camera" data-group="camera">
+      <div class="section-title">Pre-Commands · Camera &amp; Focus <span class="badge-cam">Camera</span></div>
+
+      <!-- focus -->
+      <div class="cmd-card" data-tags="camera focus character">
+        <div class="cmd-header" onclick="toggle(this)">
+          <div class="cmd-header-left">
+            <div class="cmd-signature"><span class="cmd-name">&lt;&lt;focus</span> <span class="cmd-param">characterName</span><span class="cmd-name">&gt;&gt;</span></div>
+            <div class="cmd-desc">Sets the focus to a character. Required before skill rolls. Only one focus per node.</div>
+          </div>
+          <div class="cmd-meta"><span class="chevron">▶</span></div>
+        </div>
+        <div class="cmd-body">
+          <div class="cmd-body-inner">
+            <div class="detail-block">
+              <h4>C# Registration</h4>
+              <div class="code-block"><span class="kw">dialogueRunner</span>.<span class="fn">AddCommandHandler</span>(
+  <span class="str">"focus"</span>,
+  (<span class="param">string</span> characterName) => {
+    <span class="comment">// Find and cache the focused character</span>
+    focusedCharacter = CharacterManager
+      .<span class="fn">FindByName</span>(characterName);
+  }
+);</div>
+            </div>
+            <div class="detail-block">
+              <h4>Yarn Usage</h4>
+              <div class="code-block"><span class="comment">// Focus Alaron before a skill roll</span>
+<span class="kw">&lt;&lt;focus</span> <span class="param">Alaron</span><span class="kw">&gt;&gt;</span>
+<span class="kw">&lt;&lt;roll</span> <span class="param">Loremaster</span><span class="kw">&gt;&gt;</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- cutToCamera -->
+      <div class="cmd-card" data-tags="camera cut">
+        <div class="cmd-header" onclick="toggle(this)">
+          <div class="cmd-header-left">
+            <div class="cmd-signature"><span class="cmd-name">&lt;&lt;cutToCamera</span> <span class="cmd-param">referencePointNumber</span><span class="cmd-name">&gt;&gt;</span></div>
+            <div class="cmd-desc">Instantly cuts the camera to the specified reference point number.</div>
+          </div>
+          <div class="cmd-meta"><span class="chevron">▶</span></div>
+        </div>
+        <div class="cmd-body">
+          <div class="cmd-body-inner">
+            <div class="detail-block">
+              <h4>C# Registration</h4>
+              <div class="code-block"><span class="kw">dialogueRunner</span>.<span class="fn">AddCommandHandler</span>(
+  <span class="str">"cutToCamera"</span>,
+  (<span class="param">int</span> refPoint) => {
+    CameraManager.<span class="fn">CutToPoint</span>(refPoint);
+  }
+);</div>
+            </div>
+            <div class="detail-block">
+              <h4>Yarn Usage</h4>
+              <div class="code-block"><span class="kw">&lt;&lt;cutToCamera</span> <span class="param">3</span><span class="kw">&gt;&gt;</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- cutTopov -->
+      <div class="cmd-card" data-tags="camera cut pov">
+        <div class="cmd-header" onclick="toggle(this)">
+          <div class="cmd-header-left">
+            <div class="cmd-signature"><span class="cmd-name">&lt;&lt;cutTopov</span> <span class="cmd-param">actorName</span><span class="cmd-name">&gt;&gt;</span></div>
+            <div class="cmd-desc">Instantly cuts the camera to an actor's point of view.</div>
+          </div>
+          <div class="cmd-meta"><span class="chevron">▶</span></div>
+        </div>
+        <div class="cmd-body">
+          <div class="cmd-body-inner">
+            <div class="detail-block">
+              <h4>C# Registration</h4>
+              <div class="code-block"><span class="kw">dialogueRunner</span>.<span class="fn">AddCommandHandler</span>(
+  <span class="str">"cutTopov"</span>,
+  (<span class="param">string</span> actorName) => {
+    var actor = ActorManager.<span class="fn">Find</span>(actorName);
+    CameraManager.<span class="fn">CutToPOV</span>(actor);
+  }
+);</div>
+            </div>
+            <div class="detail-block">
+              <h4>Yarn Usage</h4>
+              <div class="code-block"><span class="kw">&lt;&lt;cutTopov</span> <span class="param">Alaron</span><span class="kw">&gt;&gt;</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- on -->
+      <div class="cmd-card" data-tags="camera on reference">
+        <div class="cmd-header" onclick="toggle(this)">
+          <div class="cmd-header-left">
+            <div class="cmd-signature"><span class="cmd-name">&lt;&lt;on</span> <span class="cmd-param">referencePointNumber</span><span class="cmd-name">&gt;&gt;</span></div>
+            <div class="cmd-desc">Points the camera at the specified reference point.</div>
+          </div>
+          <div class="cmd-meta"><span class="chevron">▶</span></div>
+        </div>
+        <div class="cmd-body">
+          <div class="cmd-body-inner">
+            <div class="detail-block">
+              <h4>C# Registration</h4>
+              <div class="code-block"><span class="kw">dialogueRunner</span>.<span class="fn">AddCommandHandler</span>(
+  <span class="str">"on"</span>,
+  (<span class="param">int</span> refPoint) => {
+    CameraManager.<span class="fn">LookAt</span>(refPoint);
+  }
+);</div>
+            </div>
+            <div class="detail-block">
+              <h4>Yarn Usage</h4>
+              <div class="code-block"><span class="kw">&lt;&lt;on</span> <span class="param">2</span><span class="kw">&gt;&gt;</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- onpov -->
+      <div class="cmd-card" data-tags="camera on pov actor">
+        <div class="cmd-header" onclick="toggle(this)">
+          <div class="cmd-header-left">
+            <div class="cmd-signature"><span class="cmd-name">&lt;&lt;onpov</span> <span class="cmd-param">actorName</span><span class="cmd-name">&gt;&gt;</span></div>
+            <div class="cmd-desc">Points the camera at an actor's position.</div>
+          </div>
+          <div class="cmd-meta"><span class="chevron">▶</span></div>
+        </div>
+        <div class="cmd-body">
+          <div class="cmd-body-inner">
+            <div class="detail-block">
+              <h4>C# Registration</h4>
+              <div class="code-block"><span class="kw">dialogueRunner</span>.<span class="fn">AddCommandHandler</span>(
+  <span class="str">"onpov"</span>,
+  (<span class="param">string</span> actorName) => {
+    var actor = ActorManager.<span class="fn">Find</span>(actorName);
+    CameraManager.<span class="fn">LookAtActor</span>(actor);
+  }
+);</div>
+            </div>
+            <div class="detail-block">
+              <h4>Yarn Usage</h4>
+              <div class="code-block"><span class="kw">&lt;&lt;onpov</span> <span class="param">Sheridan</span><span class="kw">&gt;&gt;</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- angleTo -->
+      <div class="cmd-card" data-tags="camera angle linear">
+        <div class="cmd-header" onclick="toggle(this)">
+          <div class="cmd-header-left">
+            <div class="cmd-signature"><span class="cmd-name">&lt;&lt;angleTo</span> <span class="cmd-param">referencePointNumber</span><span class="cmd-name">&gt;&gt;</span></div>
+            <div class="cmd-desc">Linearly moves the camera to face a reference point. Requires a preceding &lt;&lt;speed&gt;&gt; command.</div>
+          </div>
+          <div class="cmd-meta"><span class="chevron">▶</span></div>
+        </div>
+        <div class="cmd-body">
+          <div class="cmd-body-inner">
+            <div class="detail-block">
+              <h4>C# Registration</h4>
+              <div class="code-block"><span class="kw">dialogueRunner</span>.<span class="fn">AddCommandHandler</span>(
+  <span class="str">"angleTo"</span>,
+  (<span class="param">int</span> refPoint) => {
+    CameraManager.<span class="fn">AngleTo</span>(refPoint, currentSpeed);
+  }
+);</div>
+            </div>
+            <div class="detail-block">
+              <h4>Yarn Usage</h4>
+              <div class="code-block"><span class="kw">&lt;&lt;speed</span> <span class="param">medium</span><span class="kw">&gt;&gt;</span>
+<span class="kw">&lt;&lt;angleTo</span> <span class="param">4</span><span class="kw">&gt;&gt;</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- angleTopov -->
+      <div class="cmd-card" data-tags="camera angle pov linear">
+        <div class="cmd-header" onclick="toggle(this)">
+          <div class="cmd-header-left">
+            <div class="cmd-signature"><span class="cmd-name">&lt;&lt;angleTopov</span> <span class="cmd-param">actorName</span><span class="cmd-name">&gt;&gt;</span></div>
+            <div class="cmd-desc">Linearly moves the camera to face an actor. Requires a preceding &lt;&lt;speed&gt;&gt; command.</div>
+          </div>
+          <div class="cmd-meta"><span class="chevron">▶</span></div>
+        </div>
+        <div class="cmd-body">
+          <div class="cmd-body-inner">
+            <div class="detail-block">
+              <h4>C# Registration</h4>
+              <div class="code-block"><span class="kw">dialogueRunner</span>.<span class="fn">AddCommandHandler</span>(
+  <span class="str">"angleTopov"</span>,
+  (<span class="param">string</span> actorName) => {
+    var actor = ActorManager.<span class="fn">Find</span>(actorName);
+    CameraManager.<span class="fn">AngleToPOV</span>(actor, currentSpeed);
+  }
+);</div>
+            </div>
+            <div class="detail-block">
+              <h4>Yarn Usage</h4>
+              <div class="code-block"><span class="kw">&lt;&lt;speed</span> <span class="param">slow</span><span class="kw">&gt;&gt;</span>
+<span class="kw">&lt;&lt;angleTopov</span> <span class="param">Dougal</span><span class="kw">&gt;&gt;</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- sineTo / sineTopov -->
+      <div class="cmd-card" data-tags="camera sine">
+        <div class="cmd-header" onclick="toggle(this)">
+          <div class="cmd-header-left">
+            <div class="cmd-signature"><span class="cmd-name">&lt;&lt;sineTo</span> <span class="cmd-param">referencePointNumber</span><span class="cmd-name">&gt;&gt;</span> &nbsp;/&nbsp; <span class="cmd-name">&lt;&lt;sineTopov</span> <span class="cmd-param">actorName</span><span class="cmd-name">&gt;&gt;</span></div>
+            <div class="cmd-desc">Moves the camera with a sine-eased curve (slow → fast → slow).</div>
+          </div>
+          <div class="cmd-meta"><span class="chevron">▶</span></div>
+        </div>
+        <div class="cmd-body">
+          <div class="cmd-body-inner">
+            <div class="detail-block">
+              <h4>C# Registration</h4>
+              <div class="code-block"><span class="kw">dialogueRunner</span>.<span class="fn">AddCommandHandler</span>(
+  <span class="str">"sineTo"</span>,
+  (<span class="param">int</span> refPoint) => {
+    CameraManager.<span class="fn">SineMoveTo</span>(refPoint, currentSpeed);
+  }
+);
+<span class="kw">dialogueRunner</span>.<span class="fn">AddCommandHandler</span>(
+  <span class="str">"sineTopov"</span>,
+  (<span class="param">string</span> actorName) => {
+    var actor = ActorManager.<span class="fn">Find</span>(actorName);
+    CameraManager.<span class="fn">SineMoveToPOV</span>(actor, currentSpeed);
+  }
+);</div>
+            </div>
+            <div class="detail-block">
+              <h4>Yarn Usage</h4>
+              <div class="code-block"><span class="kw">&lt;&lt;speed</span> <span class="param">fast</span><span class="kw">&gt;&gt;</span>
+<span class="kw">&lt;&lt;sineTo</span> <span class="param">1</span><span class="kw">&gt;&gt;</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- trackon -->
+      <div class="cmd-card" data-tags="camera track linear speed">
+        <div class="cmd-header" onclick="toggle(this)">
+          <div class="cmd-header-left">
+            <div class="cmd-signature"><span class="cmd-name">&lt;&lt;trackon</span> <span class="cmd-param">referencePointNumber</span><span class="cmd-name">&gt;&gt;</span></div>
+            <div class="cmd-desc">Linearly tracks (moves) the camera to a reference point. Always pair with &lt;&lt;speed&gt;&gt;.</div>
+          </div>
+          <div class="cmd-meta"><span class="chevron">▶</span></div>
+        </div>
+        <div class="cmd-body">
+          <div class="cmd-body-inner">
+            <div class="detail-block">
+              <h4>C# Registration</h4>
+              <div class="code-block"><span class="kw">dialogueRunner</span>.<span class="fn">AddCommandHandler</span>(
+  <span class="str">"trackon"</span>,
+  (<span class="param">int</span> refPoint) => {
+    CameraManager.<span class="fn">TrackTo</span>(refPoint, currentSpeed);
+  }
+);</div>
+            </div>
+            <div class="detail-block">
+              <h4>Yarn Usage</h4>
+              <div class="code-block"><span class="kw">&lt;&lt;speed</span> <span class="param">10</span><span class="kw">&gt;&gt;</span>
+<span class="kw">&lt;&lt;trackon</span> <span class="param">5</span><span class="kw">&gt;&gt;</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- speed -->
+      <div class="cmd-card" data-tags="camera speed linear">
+        <div class="cmd-header" onclick="toggle(this)">
+          <div class="cmd-header-left">
+            <div class="cmd-signature"><span class="cmd-name">&lt;&lt;speed</span> <span class="cmd-param">speedValue</span><span class="cmd-name">&gt;&gt;</span></div>
+            <div class="cmd-desc">Sets the speed for any subsequent linear camera movement. Use <code>slow</code> (30), <code>medium</code> (10), <code>fast</code> (5), or a raw integer in 60ths of a second.</div>
+          </div>
+          <div class="cmd-meta"><span class="chevron">▶</span></div>
+        </div>
+        <div class="cmd-body">
+          <div class="cmd-body-inner">
+            <div class="detail-block">
+              <h4>C# Registration</h4>
+              <div class="code-block"><span class="param">int</span> currentSpeed = <span class="param">10</span>; <span class="comment">// module-level</span>
+
+<span class="kw">dialogueRunner</span>.<span class="fn">AddCommandHandler</span>(
+  <span class="str">"speed"</span>,
+  (<span class="param">string</span> value) => {
+    currentSpeed = value.<span class="fn">ToLower</span>() <span class="kw">switch</span> {
+      <span class="str">"slow"</span>   => <span class="param">30</span>,
+      <span class="str">"medium"</span> => <span class="param">10</span>,
+      <span class="str">"fast"</span>   => <span class="param">5</span>,
+      _ => <span class="param">int</span>.<span class="fn">Parse</span>(value)
+    };
+  }
+);</div>
+            </div>
+            <div class="detail-block">
+              <h4>Yarn Usage</h4>
+              <div class="code-block"><span class="kw">&lt;&lt;speed</span> <span class="param">slow</span><span class="kw">&gt;&gt;</span>    <span class="comment">// 30 frames</span>
+<span class="kw">&lt;&lt;speed</span> <span class="param">medium</span><span class="kw">&gt;&gt;</span>  <span class="comment">// 10 frames</span>
+<span class="kw">&lt;&lt;speed</span> <span class="param">fast</span><span class="kw">&gt;&gt;</span>    <span class="comment">// 5 frames</span>
+<span class="kw">&lt;&lt;speed</span> <span class="param">20</span><span class="kw">&gt;&gt;</span>      <span class="comment">// 20/60ths of a second</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════ VARIABLES ═══ -->
+    <div class="section" id="variables" data-group="variable">
+      <div class="section-title">Variable Retrieval Commands <span class="badge-var">Variables</span></div>
+
+      <div class="deprecated-note"><strong>Note:</strong> Variable retrieval commands are used inside <code>if</code> and <code>switch</code> nodes. <code>if</code> nodes only accept boolean results; <code>switch</code> nodes accept boolean or integer. In YarnSpinner, these are implemented as custom functions that return values.</div>
+
+      <!-- checkgold -->
+      <div class="cmd-card" data-tags="variable gold integer">
+        <div class="cmd-header" onclick="toggle(this)">
+          <div class="cmd-header-left">
+            <div class="cmd-signature"><span class="cmd-name">checkgold()</span></div>
+            <div class="cmd-desc">Returns the total gold the party currently holds.</div>
+          </div>
+          <div class="cmd-meta"><span class="return-badge return-int">→ int</span><span class="chevron">▶</span></div>
+        </div>
+        <div class="cmd-body">
+          <div class="cmd-body-inner">
+            <div class="detail-block">
+              <h4>C# Registration</h4>
+              <div class="code-block"><span class="kw">dialogueRunner</span>.<span class="fn">AddFunction</span>(
+  <span class="str">"checkgold"</span>,
+  () => PartyManager.<span class="fn">GetGold</span>()
+);</div>
+            </div>
+            <div class="detail-block">
+              <h4>Yarn Usage</h4>
+              <div class="code-block"><span class="kw">&lt;&lt;if</span> <span class="fn">checkgold</span>() >= <span class="param">100</span><span class="kw">&gt;&gt;</span>
+  You have enough gold.
+<span class="kw">&lt;&lt;endif&gt;&gt;</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- checkInv -->
+      <div class="cmd-card" data-tags="variable inventory item boolean">
+        <div class="cmd-header" onclick="toggle(this)">
+          <div class="cmd-header-left">
+            <div class="cmd-signature"><span class="cmd-name">checkInv(</span><span class="cmd-param">itemName</span><span class="cmd-name">)</span></div>
+            <div class="cmd-desc">Returns true if the party (or any equipped character) holds the named item.</div>
+          </div>
+          <div class="cmd-meta"><span class="return-badge return-bool">→ bool</span><span class="chevron">▶</span></div>
+        </div>
+        <div class="cmd-body">
+          <div class="cmd-body-inner">
+            <div class="detail-block">
+              <h4>C# Registration</h4>
+              <div class="code-block"><span class="kw">dialogueRunner</span>.<span class="fn">AddFunction</span>(
+  <span class="str">"checkInv"</span>,
+  (<span class="param">string</span> item) =>
+    Inventory.<span class="fn">Contains</span>(item)
+);</div>
+            </div>
+            <div class="detail-block">
+              <h4>Yarn Usage</h4>
+              <div class="code-block"><span class="kw">&lt;&lt;if</span> <span class="fn">checkInv</span>(<span class="str">"horn of kryon"</span>)<span class="kw">&gt;&gt;</span>
+  You produce the horn...
+<span class="kw">&lt;&lt;endif&gt;&gt;</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- getHighStat -->
+      <div class="cmd-card" data-tags="variable stat character integer">
+        <div class="cmd-header" onclick="toggle(this)">
+          <div class="cmd-header-left">
+            <div class="cmd-signature"><span class="cmd-name">getHighStat(</span><span class="cmd-param">statName</span><span class="cmd-name">)</span></div>
+            <div class="cmd-desc">Scans all party members and returns the highest value of the named statistic.</div>
+          </div>
+          <div class="cmd-meta"><span class="return-badge return-int">→ int</span><span class="chevron">▶</span></div>
+        </div>
+        <div class="cmd-body">
+          <div class="cmd-body-inner">
+            <div class="detail-block">
+              <h4>C# Registration</h4>
+              <div class="code-block"><span class="kw">dialogueRunner</span>.<span class="fn">AddFunction</span>(
+  <span class="str">"getHighStat"</span>,
+  (<span class="param">string</span> stat) =>
+    PartyManager.<span class="fn">GetHighestStat</span>(stat)
+);</div>
+            </div>
+            <div class="detail-block">
+              <h4>Yarn Usage</h4>
+              <div class="code-block"><span class="kw">&lt;&lt;if</span> <span class="fn">getHighStat</span>(<span class="str">"Perception"</span>) >= <span class="param">15</span><span class="kw">&gt;&gt;</span>
+  Someone notices the trap.
+<span class="kw">&lt;&lt;endif&gt;&gt;</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- getLowStat -->
+      <div class="cmd-card" data-tags="variable stat character integer">
+        <div class="cmd-header" onclick="toggle(this)">
+          <div class="cmd-header-left">
+            <div class="cmd-signature"><span class="cmd-name">getLowStat(</span><span class="cmd-param">statName</span><span class="cmd-name">)</span></div>
+            <div class="cmd-desc">Scans all party members and returns the lowest value of the named statistic.</div>
+          </div>
+          <div class="cmd-meta"><span class="return-badge return-int">→ int</span><span class="chevron">▶</span></div>
+        </div>
+        <div class="cmd-body">
+          <div class="cmd-body-inner">
+            <div class="detail-block">
+              <h4>C# Registration</h4>
+              <div class="code-block"><span class="kw">dialogueRunner</span>.<span class="fn">AddFunction</span>(
+  <span class="str">"getLowStat"</span>,
+  (<span class="param">string</span> stat) =>
+    PartyManager.<span class="fn">GetLowestStat</span>(stat)
+);</div>
+            </div>
+            <div class="detail-block">
+              <h4>Yarn Usage</h4>
+              <div class="code-block"><span class="kw">&lt;&lt;if</span> <span class="fn">getLowStat</span>(<span class="str">"Stamina"</span>) <= <span class="param">5</span><span class="kw">&gt;&gt;</span>
+  Someone is exhausted.
+<span class="kw">&lt;&lt;endif&gt;&gt;</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- getStat -->
+      <div class="cmd-card" data-tags="variable stat focused character integer">
+        <div class="cmd-header" onclick="toggle(this)">
+          <div class="cmd-header-left">
+            <div class="cmd-signature"><span class="cmd-name">getStat(</span><span class="cmd-param">statName</span><span class="cmd-name">)</span></div>
+            <div class="cmd-desc">Returns the named statistic for the currently focused character.</div>
+          </div>
+          <div class="cmd-meta"><span class="return-badge return-int">→ int</span><span class="chevron">▶</span></div>
+        </div>
+        <div class="cmd-body">
+          <div class="cmd-body-inner">
+            <div class="detail-block">
+              <h4>C# Registration</h4>
+              <div class="code-block"><span class="kw">dialogueRunner</span>.<span class="fn">AddFunction</span>(
+  <span class="str">"getStat"</span>,
+  (<span class="param">string</span> stat) =>
+    focusedCharacter.<span class="fn">GetStat</span>(stat)
+);</div>
+            </div>
+            <div class="detail-block">
+              <h4>Yarn Usage</h4>
+              <div class="code-block"><span class="kw">&lt;&lt;focus</span> <span class="param">Alaron</span><span class="kw">&gt;&gt;</span>
+<span class="kw">&lt;&lt;if</span> <span class="fn">getStat</span>(<span class="str">"Strength"</span>) >= <span class="param">12</span><span class="kw">&gt;&gt;</span>
+  You force the door open.
+<span class="kw">&lt;&lt;endif&gt;&gt;</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- getState -->
+      <div class="cmd-card" data-tags="variable state boolean flag">
+        <div class="cmd-header" onclick="toggle(this)">
+          <div class="cmd-header-left">
+            <div class="cmd-signature"><span class="cmd-name">getState(</span><span class="cmd-param">stateName</span><span class="cmd-name">)</span></div>
+            <div class="cmd-desc">Returns the boolean value of a named game state flag.</div>
+          </div>
+          <div class="cmd-meta"><span class="return-badge return-bool">→ bool</span><span class="chevron">▶</span></div>
+        </div>
+        <div class="cmd-body">
+          <div class="cmd-body-inner">
+            <div class="detail-block">
+              <h4>C# Registration</h4>
+              <div class="code-block"><span class="kw">dialogueRunner</span>.<span class="fn">AddFunction</span>(
+  <span class="str">"getState"</span>,
+  (<span class="param">string</span> state) =>
+    GameState.<span class="fn">Get</span>(state)
+);</div>
+            </div>
+            <div class="detail-block">
+              <h4>Yarn Usage</h4>
+              <div class="code-block"><span class="kw">&lt;&lt;if</span> <span class="fn">getState</span>(<span class="str">"SheridanLied"</span>)<span class="kw">&gt;&gt;</span>
+  "We know what you really are..."
+<span class="kw">&lt;&lt;endif&gt;&gt;</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- isPresent -->
+      <div class="cmd-card" data-tags="variable character party boolean">
+        <div class="cmd-header" onclick="toggle(this)">
+          <div class="cmd-header-left">
+            <div class="cmd-signature"><span class="cmd-name">isPresent(</span><span class="cmd-param">characterName</span><span class="cmd-name">)</span></div>
+            <div class="cmd-desc">Returns true if the named character is currently in the party.</div>
+          </div>
+          <div class="cmd-meta"><span class="return-badge return-bool">→ bool</span><span class="chevron">▶</span></div>
+        </div>
+        <div class="cmd-body">
+          <div class="cmd-body-inner">
+            <div class="detail-block">
+              <h4>C# Registration</h4>
+              <div class="code-block"><span class="kw">dialogueRunner</span>.<span class="fn">AddFunction</span>(
+  <span class="str">"isPresent"</span>,
+  (<span class="param">string</span> charName) =>
+    PartyManager.<span class="fn">IsInParty</span>(charName)
+);</div>
+            </div>
+            <div class="detail-block">
+              <h4>Yarn Usage</h4>
+              <div class="code-block"><span class="kw">&lt;&lt;if</span> <span class="fn">isPresent</span>(<span class="str">"Oriana"</span>)<span class="kw">&gt;&gt;</span>
+  Oriana: "I've heard of this place..."
+<span class="kw">&lt;&lt;endif&gt;&gt;</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- partySize -->
+      <div class="cmd-card" data-tags="variable party size integer">
+        <div class="cmd-header" onclick="toggle(this)">
+          <div class="cmd-header-left">
+            <div class="cmd-signature"><span class="cmd-name">partySize()</span></div>
+            <div class="cmd-desc">Returns the number of party members, including Alaron.</div>
+          </div>
+          <div class="cmd-meta"><span class="return-badge return-int">→ int</span><span class="chevron">▶</span></div>
+        </div>
+        <div class="cmd-body">
+          <div class="cmd-body-inner">
+            <div class="detail-block">
+              <h4>C# Registration</h4>
+              <div class="code-block"><span class="kw">dialogueRunner</span>.<span class="fn">AddFunction</span>(
+  <span class="str">"partySize"</span>,
+  () => PartyManager.<span class="fn">Count</span>()
+);</div>
+            </div>
+            <div class="detail-block">
+              <h4>Yarn Usage</h4>
+              <div class="code-block"><span class="kw">&lt;&lt;if</span> <span class="fn">partySize</span>() >= <span class="param">3</span><span class="kw">&gt;&gt;</span>
+  "There are too many of you."
+<span class="kw">&lt;&lt;endif&gt;&gt;</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- roll -->
+      <div class="cmd-card" data-tags="variable roll skill task integer dos">
+        <div class="cmd-header" onclick="toggle(this)">
+          <div class="cmd-header-left">
+            <div class="cmd-signature"><span class="cmd-name">roll(</span><span class="cmd-param">taskName</span><span class="cmd-name">)</span></div>
+            <div class="cmd-desc">Performs a skill roll for the focused character and returns the degree of success (DOS) as an integer.</div>
+          </div>
+          <div class="cmd-meta"><span class="return-badge return-int">→ int</span><span class="chevron">▶</span></div>
+        </div>
+        <div class="cmd-body">
+          <div class="cmd-body-inner">
+            <div class="detail-block">
+              <h4>C# Registration</h4>
+              <div class="code-block"><span class="kw">dialogueRunner</span>.<span class="fn">AddFunction</span>(
+  <span class="str">"roll"</span>,
+  (<span class="param">string</span> task) =>
+    SkillSystem.<span class="fn">Roll</span>(focusedCharacter, task)
+);</div>
+            </div>
+            <div class="detail-block">
+              <h4>Yarn Usage</h4>
+              <div class="code-block"><span class="kw">&lt;&lt;focus</span> <span class="param">Alaron</span><span class="kw">&gt;&gt;</span>
+<span class="kw">&lt;&lt;if</span> <span class="fn">roll</span>(<span class="str">"Loremaster"</span>) >= <span class="param">2</span><span class="kw">&gt;&gt;</span>
+  You recall the ancient text.
+<span class="kw">&lt;&lt;endif&gt;&gt;</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════ FLOW ═══ -->
+    <div class="section" id="flow" data-group="other">
+      <div class="section-title">Flow &amp; State Commands <span class="badge-other">Game Flow</span></div>
+
+      <!-- quit -->
+      <div class="cmd-card" data-tags="other quit dialog end">
+        <div class="cmd-header" onclick="toggle(this)">
+          <div class="cmd-header-left">
+            <div class="cmd-signature"><span class="cmd-name">&lt;&lt;quit&gt;&gt;</span></div>
+            <div class="cmd-desc">Ends the current dialog immediately.</div>
+          </div>
+          <div class="cmd-meta"><span class="return-badge return-void">void</span><span class="chevron">▶</span></div>
+        </div>
+        <div class="cmd-body">
+          <div class="cmd-body-inner">
+            <div class="detail-block">
+              <h4>C# Registration</h4>
+              <div class="code-block"><span class="kw">dialogueRunner</span>.<span class="fn">AddCommandHandler</span>(
+  <span class="str">"quit"</span>,
+  () => dialogueRunner.<span class="fn">Stop</span>()
+);</div>
+            </div>
+            <div class="detail-block">
+              <h4>Yarn Usage</h4>
+              <div class="code-block">I have nothing more to say.
+<span class="kw">&lt;&lt;quit&gt;&gt;</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- fade -->
+      <div class="cmd-card" data-tags="other fade transition time">
+        <div class="cmd-header" onclick="toggle(this)">
+          <div class="cmd-header-left">
+            <div class="cmd-signature"><span class="cmd-name">&lt;&lt;fade&gt;&gt;</span></div>
+            <div class="cmd-desc">Fades the screen out then back in to simulate a passage of time.</div>
+          </div>
+          <div class="cmd-meta"><span class="return-badge return-void">void</span><span class="chevron">▶</span></div>
+        </div>
+        <div class="cmd-body">
+          <div class="cmd-body-inner">
+            <div class="detail-block">
+              <h4>C# Registration</h4>
+              <div class="code-block"><span class="kw">dialogueRunner</span>.<span class="fn">AddCommandHandler</span>(
+  <span class="str">"fade"</span>,
+  () => <span class="kw">StartCoroutine</span>(
+    ScreenFader.<span class="fn">FadeOutIn</span>()
+  )
+);</div>
+            </div>
+            <div class="detail-block">
+              <h4>Yarn Usage</h4>
+              <div class="code-block">Several hours passed...
+<span class="kw">&lt;&lt;fade&gt;&gt;</span>
+It was now morning.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- goto -->
+      <div class="cmd-card" data-tags="other goto jump node line">
+        <div class="cmd-header" onclick="toggle(this)">
+          <div class="cmd-header-left">
+            <div class="cmd-signature"><span class="cmd-name">&lt;&lt;goto</span> <span class="cmd-param">nodeName</span><span class="cmd-name">&gt;&gt;</span></div>
+            <div class="cmd-desc">Jumps to a different dialog node by name when a topic is exhausted. In YarnSpinner, use <code>&lt;&lt;jump NodeName&gt;&gt;</code>.</div>
+          </div>
+          <div class="cmd-meta"><span class="return-badge return-void">void</span><span class="chevron">▶</span></div>
+        </div>
+        <div class="cmd-body">
+          <div class="cmd-body-inner">
+            <div class="detail-block">
+              <h4>Yarn Equivalent</h4>
+              <div class="code-block"><span class="comment">// YarnSpinner native — no C# needed</span>
+<span class="kw">&lt;&lt;jump</span> <span class="param">TopicSelection</span><span class="kw">&gt;&gt;</span></div>
+            </div>
+            <div class="detail-block">
+              <h4>Yarn Usage</h4>
+              <div class="code-block">That topic is settled.
+<span class="kw">&lt;&lt;jump</span> <span class="param">MainMenu</span><span class="kw">&gt;&gt;</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- setStateOn / setStateOff -->
+      <div class="cmd-card" data-tags="other state flag set on off">
+        <div class="cmd-header" onclick="toggle(this)">
+          <div class="cmd-header-left">
+            <div class="cmd-signature"><span class="cmd-name">&lt;&lt;setStateOn</span> <span class="cmd-param">stateName</span><span class="cmd-name">&gt;&gt;</span> &nbsp;/&nbsp; <span class="cmd-name">&lt;&lt;setStateOff</span> <span class="cmd-param">stateName</span><span class="cmd-name">&gt;&gt;</span></div>
+            <div class="cmd-desc">Sets a named game state flag to true or false. Used to track dialog outcomes that affect future scenes.</div>
+          </div>
+          <div class="cmd-meta"><span class="return-badge return-void">void</span><span class="chevron">▶</span></div>
+        </div>
+        <div class="cmd-body">
+          <div class="cmd-body-inner">
+            <div class="detail-block">
+              <h4>C# Registration</h4>
+              <div class="code-block"><span class="kw">dialogueRunner</span>.<span class="fn">AddCommandHandler</span>(
+  <span class="str">"setStateOn"</span>,
+  (<span class="param">string</span> state) =>
+    GameState.<span class="fn">Set</span>(state, <span class="param">true</span>)
+);
+<span class="kw">dialogueRunner</span>.<span class="fn">AddCommandHandler</span>(
+  <span class="str">"setStateOff"</span>,
+  (<span class="param">string</span> state) =>
+    GameState.<span class="fn">Set</span>(state, <span class="param">false</span>)
+);</div>
+            </div>
+            <div class="detail-block">
+              <h4>Yarn Usage</h4>
+              <div class="code-block"><span class="comment">// Sheridan just lied</span>
+<span class="kw">&lt;&lt;setStateOn</span> <span class="param">SheridanLied</span><span class="kw">&gt;&gt;</span>
+
+<span class="comment">// Party lost the Horn</span>
+<span class="kw">&lt;&lt;setStateOff</span> <span class="param">PartyHasHorn</span><span class="kw">&gt;&gt;</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- say -->
+      <div class="cmd-card" data-tags="other say message bank random">
+        <div class="cmd-header" onclick="toggle(this)">
+          <div class="cmd-header-left">
+            <div class="cmd-signature"><span class="cmd-name">&lt;&lt;say</span> <span class="cmd-param">messageBank</span><span class="cmd-name">&gt;&gt;</span></div>
+            <div class="cmd-desc">Randomly selects and displays a phrase from the named message bank. Used for generic NPC dialog.</div>
+          </div>
+          <div class="cmd-meta"><span class="return-badge return-void">void</span><span class="chevron">▶</span></div>
+        </div>
+        <div class="cmd-body">
+          <div class="cmd-body-inner">
+            <div class="detail-block">
+              <h4>C# Registration</h4>
+              <div class="code-block"><span class="kw">dialogueRunner</span>.<span class="fn">AddCommandHandler</span>(
+  <span class="str">"say"</span>,
+  (<span class="param">string</span> bank) => {
+    var msg = MessageBanks.<span class="fn">GetRandom</span>(bank);
+    DialogueUI.<span class="fn">Display</span>(msg);
+  }
+);</div>
+            </div>
+            <div class="detail-block">
+              <h4>Yarn Usage</h4>
+              <div class="code-block"><span class="kw">&lt;&lt;say</span> <span class="param">ErromonResidents</span><span class="kw">&gt;&gt;</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- dialog -->
+      <div class="cmd-card" data-tags="other dialog reference piece chain">
+        <div class="cmd-header" onclick="toggle(this)">
+          <div class="cmd-header-left">
+            <div class="cmd-signature"><span class="cmd-name">&lt;&lt;dialog</span> <span class="cmd-param">dialogReference</span><span class="cmd-name">&gt;&gt;</span></div>
+            <div class="cmd-desc">Loads and runs another dialog file, allowing large dialogs to be broken into manageable pieces.</div>
+          </div>
+          <div class="cmd-meta"><span class="return-badge return-void">void</span><span class="chevron">▶</span></div>
+        </div>
+        <div class="cmd-body">
+          <div class="cmd-body-inner">
+            <div class="detail-block">
+              <h4>C# Registration</h4>
+              <div class="code-block"><span class="kw">dialogueRunner</span>.<span class="fn">AddCommandHandler</span>(
+  <span class="str">"dialog"</span>,
+  (<span class="param">string</span> dialogRef) => {
+    dialogueRunner.<span class="fn">StartDialogue</span>(dialogRef);
+  }
+);</div>
+            </div>
+            <div class="detail-block">
+              <h4>Yarn Usage</h4>
+              <div class="code-block"><span class="kw">&lt;&lt;dialog</span> <span class="param">KingMeeting_Part2</span><span class="kw">&gt;&gt;</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- sound -->
+      <div class="cmd-card" data-tags="other sound effect audio sfx">
+        <div class="cmd-header" onclick="toggle(this)">
+          <div class="cmd-header-left">
+            <div class="cmd-signature"><span class="cmd-name">&lt;&lt;sound</span> <span class="cmd-param">soundEffect</span><span class="cmd-name">&gt;&gt;</span></div>
+            <div class="cmd-desc">Plays the named sound effect.</div>
+          </div>
+          <div class="cmd-meta"><span class="return-badge return-void">void</span><span class="chevron">▶</span></div>
+        </div>
+        <div class="cmd-body">
+          <div class="cmd-body-inner">
+            <div class="detail-block">
+              <h4>C# Registration</h4>
+              <div class="code-block"><span class="kw">dialogueRunner</span>.<span class="fn">AddCommandHandler</span>(
+  <span class="str">"sound"</span>,
+  (<span class="param">string</span> sfxName) =>
+    AudioManager.<span class="fn">Play</span>(sfxName)
+);</div>
+            </div>
+            <div class="detail-block">
+              <h4>Yarn Usage</h4>
+              <div class="code-block"><span class="kw">&lt;&lt;sound</span> <span class="param">DoorCreak</span><span class="kw">&gt;&gt;</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- comment -->
+      <div class="cmd-card" data-tags="other comment note documentation">
+        <div class="cmd-header" onclick="toggle(this)">
+          <div class="cmd-header-left">
+            <div class="cmd-signature"><span class="cmd-name">&lt;&lt;//</span> <span class="cmd-param">text</span><span class="cmd-name">&gt;&gt;</span></div>
+            <div class="cmd-desc">A comment. Ignored by the engine. Used for internal notes. Do not use alone in a node — accompany with other commands. In YarnSpinner, use the native <code>// comment</code> syntax instead.</div>
+          </div>
+          <div class="cmd-meta"><span class="return-badge return-void">void</span><span class="chevron">▶</span></div>
+        </div>
+        <div class="cmd-body">
+          <div class="cmd-body-inner full">
+            <div class="detail-block">
+              <h4>Yarn Equivalent</h4>
+              <div class="code-block"><span class="comment">// YarnSpinner native comment — no C# needed</span>
+<span class="comment">// This node handles the king's first meeting</span>
+<span class="kw">&lt;&lt;focus</span> <span class="param">Alaron</span><span class="kw">&gt;&gt;</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════ INVENTORY ═══ -->
+    <div class="section" id="inventory" data-group="other">
+      <div class="section-title">Inventory &amp; Gold Commands <span class="badge-other">Game Flow</span></div>
+
+      <!-- givegold / takegold -->
+      <div class="cmd-card" data-tags="other gold give take">
+        <div class="cmd-header" onclick="toggle(this)">
+          <div class="cmd-header-left">
+            <div class="cmd-signature"><span class="cmd-name">&lt;&lt;givegold</span> <span class="cmd-param">amount</span><span class="cmd-name">&gt;&gt;</span> &nbsp;/&nbsp; <span class="cmd-name">&lt;&lt;takegold</span> <span class="cmd-param">amount</span><span class="cmd-name">&gt;&gt;</span></div>
+            <div class="cmd-desc">Adds or removes the specified amount of gold from the party's total.</div>
+          </div>
+          <div class="cmd-meta"><span class="return-badge return-void">void</span><span class="chevron">▶</span></div>
+        </div>
+        <div class="cmd-body">
+          <div class="cmd-body-inner">
+            <div class="detail-block">
+              <h4>C# Registration</h4>
+              <div class="code-block"><span class="kw">dialogueRunner</span>.<span class="fn">AddCommandHandler</span>(
+  <span class="str">"givegold"</span>,
+  (<span class="param">int</span> amount) =>
+    PartyManager.<span class="fn">AddGold</span>(amount)
+);
+<span class="kw">dialogueRunner</span>.<span class="fn">AddCommandHandler</span>(
+  <span class="str">"takegold"</span>,
+  (<span class="param">int</span> amount) =>
+    PartyManager.<span class="fn">RemoveGold</span>(amount)
+);</div>
+            </div>
+            <div class="detail-block">
+              <h4>Yarn Usage</h4>
+              <div class="code-block">"Here's your reward."
+<span class="kw">&lt;&lt;givegold</span> <span class="param">50</span><span class="kw">&gt;&gt;</span>
+
+"Pay up."
+<span class="kw">&lt;&lt;takegold</span> <span class="param">20</span><span class="kw">&gt;&gt;</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- put / take item -->
+      <div class="cmd-card" data-tags="other item put take inventory">
+        <div class="cmd-header" onclick="toggle(this)">
+          <div class="cmd-header-left">
+            <div class="cmd-signature"><span class="cmd-name">&lt;&lt;put</span> <span class="cmd-param">itemName</span><span class="cmd-name">&gt;&gt;</span> &nbsp;/&nbsp; <span class="cmd-name">&lt;&lt;take</span> <span class="cmd-param">itemName</span><span class="cmd-name">&gt;&gt;</span></div>
+            <div class="cmd-desc">Adds or removes an item from the party inventory. Use multiple times for multiple items.</div>
+          </div>
+          <div class="cmd-meta"><span class="return-badge return-void">void</span><span class="chevron">▶</span></div>
+        </div>
+        <div class="cmd-body">
+          <div class="cmd-body-inner">
+            <div class="detail-block">
+              <h4>C# Registration</h4>
+              <div class="code-block"><span class="kw">dialogueRunner</span>.<span class="fn">AddCommandHandler</span>(
+  <span class="str">"put"</span>,
+  (<span class="param">string</span> item) =>
+    Inventory.<span class="fn">Add</span>(item)
+);
+<span class="kw">dialogueRunner</span>.<span class="fn">AddCommandHandler</span>(
+  <span class="str">"take"</span>,
+  (<span class="param">string</span> item) =>
+    Inventory.<span class="fn">Remove</span>(item)
+);</div>
+            </div>
+            <div class="detail-block">
+              <h4>Yarn Usage</h4>
+              <div class="code-block"><span class="comment">// Pandara gives the amulet</span>
+<span class="kw">&lt;&lt;put</span> <span class="param">AmuletOfKryon</span><span class="kw">&gt;&gt;</span>
+
+<span class="comment">// Dougal steals the Horn</span>
+<span class="kw">&lt;&lt;take</span> <span class="param">HornOfKryon</span><span class="kw">&gt;&gt;</span>
+<span class="kw">&lt;&lt;setStateOff</span> <span class="param">PartyHasHorn</span><span class="kw">&gt;&gt;</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════ MOVEMENT ═══ -->
+    <div class="section" id="movement" data-group="other">
+      <div class="section-title">Movement &amp; Animation Commands <span class="badge-other">Game Flow</span></div>
+
+      <!-- walk / run -->
+      <div class="cmd-card" data-tags="other walk run movement wanderpoint character">
+        <div class="cmd-header" onclick="toggle(this)">
+          <div class="cmd-header-left">
+            <div class="cmd-signature"><span class="cmd-name">&lt;&lt;walk</span> <span class="cmd-param">wanderpoint</span><span class="cmd-name">&gt;&gt;</span> &nbsp;/&nbsp; <span class="cmd-name">&lt;&lt;run</span> <span class="cmd-param">wanderpoint</span><span class="cmd-name">&gt;&gt;</span></div>
+            <div class="cmd-desc">Moves the focused character to a wanderpoint by walking or running. Falls back to default animation if no walk/run animation exists.</div>
+          </div>
+          <div class="cmd-meta"><span class="return-badge return-void">void</span><span class="chevron">▶</span></div>
+        </div>
+        <div class="cmd-body">
+          <div class="cmd-body-inner">
+            <div class="detail-block">
+              <h4>C# Registration</h4>
+              <div class="code-block"><span class="kw">dialogueRunner</span>.<span class="fn">AddCommandHandler</span>(
+  <span class="str">"walk"</span>,
+  (<span class="param">string</span> wp) => {
+    var point = Scene.<span class="fn">GetWanderpoint</span>(wp);
+    focusedCharacter.<span class="fn">WalkTo</span>(point);
+  }
+);
+<span class="kw">dialogueRunner</span>.<span class="fn">AddCommandHandler</span>(
+  <span class="str">"run"</span>,
+  (<span class="param">string</span> wp) => {
+    var point = Scene.<span class="fn">GetWanderpoint</span>(wp);
+    focusedCharacter.<span class="fn">RunTo</span>(point);
+  }
+);</div>
+            </div>
+            <div class="detail-block">
+              <h4>Yarn Usage</h4>
+              <div class="code-block"><span class="kw">&lt;&lt;focus</span> <span class="param">Dougal</span><span class="kw">&gt;&gt;</span>
+<span class="kw">&lt;&lt;walk</span> <span class="param">WP_DoorLeft</span><span class="kw">&gt;&gt;</span>
+<span class="kw">&lt;&lt;run</span> <span class="param">WP_Exit</span><span class="kw">&gt;&gt;</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- anim -->
+      <div class="cmd-card" data-tags="other animation anim index character">
+        <div class="cmd-header" onclick="toggle(this)">
+          <div class="cmd-header-left">
+            <div class="cmd-signature"><span class="cmd-name">&lt;&lt;anim</span> <span class="cmd-param">animationIndex</span><span class="cmd-name">&gt;&gt;</span></div>
+            <div class="cmd-desc">Makes the focused character play a specific animation (in-place). Animation index is retrieved from BorgView or the animation script.</div>
+          </div>
+          <div class="cmd-meta"><span class="return-badge return-void">void</span><span class="chevron">▶</span></div>
+        </div>
+        <div class="cmd-body">
+          <div class="cmd-body-inner">
+            <div class="detail-block">
+              <h4>C# Registration</h4>
+              <div class="code-block"><span class="kw">dialogueRunner</span>.<span class="fn">AddCommandHandler</span>(
+  <span class="str">"anim"</span>,
+  (<span class="param">int</span> animIndex) =>
+    focusedCharacter.<span class="fn">PlayAnimation</span>(animIndex)
+);</div>
+            </div>
+            <div class="detail-block">
+              <h4>Yarn Usage</h4>
+              <div class="code-block"><span class="kw">&lt;&lt;focus</span> <span class="param">Jasper</span><span class="kw">&gt;&gt;</span>
+<span class="kw">&lt;&lt;anim</span> <span class="param">7</span><span class="kw">&gt;&gt;</span> <span class="comment">// wave animation</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- face -->
+      <div class="cmd-card" data-tags="other face orient wanderpoint character">
+        <div class="cmd-header" onclick="toggle(this)">
+          <div class="cmd-header-left">
+            <div class="cmd-signature"><span class="cmd-name">&lt;&lt;face</span> <span class="cmd-param">wanderpoint</span><span class="cmd-name">&gt;&gt;</span></div>
+            <div class="cmd-desc">Rotates the focused character to face towards the specified wanderpoint.</div>
+          </div>
+          <div class="cmd-meta"><span class="return-badge return-void">void</span><span class="chevron">▶</span></div>
+        </div>
+        <div class="cmd-body">
+          <div class="cmd-body-inner">
+            <div class="detail-block">
+              <h4>C# Registration</h4>
+              <div class="code-block"><span class="kw">dialogueRunner</span>.<span class="fn">AddCommandHandler</span>(
+  <span class="str">"face"</span>,
+  (<span class="param">string</span> wp) => {
+    var point = Scene.<span class="fn">GetWanderpoint</span>(wp);
+    focusedCharacter.<span class="fn">FaceTowards</span>(point);
+  }
+);</div>
+            </div>
+            <div class="detail-block">
+              <h4>Yarn Usage</h4>
+              <div class="code-block"><span class="kw">&lt;&lt;focus</span> <span class="param">Alaron</span><span class="kw">&gt;&gt;</span>
+<span class="kw">&lt;&lt;face</span> <span class="param">WP_KingThrone</span><span class="kw">&gt;&gt;</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- place / placeitem -->
+      <div class="cmd-card" data-tags="other place position wanderpoint character prop">
+        <div class="cmd-header" onclick="toggle(this)">
+          <div class="cmd-header-left">
+            <div class="cmd-signature"><span class="cmd-name">&lt;&lt;place</span> <span class="cmd-param">wanderpoint</span><span class="cmd-name">&gt;&gt;</span> &nbsp;/&nbsp; <span class="cmd-name">&lt;&lt;placeitem</span> <span class="cmd-param">wanderpoint</span><span class="cmd-name">&gt;&gt;</span></div>
+            <div class="cmd-desc">Teleports the focused character or a prop to a wanderpoint at the start of a scripted dialog. Use before &lt;&lt;start&gt;&gt;.</div>
+          </div>
+          <div class="cmd-meta"><span class="return-badge return-void">void</span><span class="chevron">▶</span></div>
+        </div>
+        <div class="cmd-body">
+          <div class="cmd-body-inner">
+            <div class="detail-block">
+              <h4>C# Registration</h4>
+              <div class="code-block"><span class="kw">dialogueRunner</span>.<span class="fn">AddCommandHandler</span>(
+  <span class="str">"place"</span>,
+  (<span class="param">string</span> wp) => {
+    var point = Scene.<span class="fn">GetWanderpoint</span>(wp);
+    focusedCharacter.<span class="fn">PlaceAt</span>(point);
+  }
+);
+<span class="kw">dialogueRunner</span>.<span class="fn">AddCommandHandler</span>(
+  <span class="str">"placeitem"</span>,
+  (<span class="param">string</span> wp) => {
+    var point = Scene.<span class="fn">GetWanderpoint</span>(wp);
+    focusedProp.<span class="fn">PlaceAt</span>(point);
+  }
+);</div>
+            </div>
+            <div class="detail-block">
+              <h4>Yarn Usage</h4>
+              <div class="code-block"><span class="kw">&lt;&lt;focus</span> <span class="param">Ehud</span><span class="kw">&gt;&gt;</span>
+<span class="kw">&lt;&lt;place</span> <span class="param">WP_ThroneLeft</span><span class="kw">&gt;&gt;</span>
+<span class="kw">&lt;&lt;placeitem</span> <span class="param">WP_StaffRest</span><span class="kw">&gt;&gt;</span>
+<span class="kw">&lt;&lt;start&gt;&gt;</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════ MODES ═══ -->
+    <div class="section" id="modes" data-group="other">
+      <div class="section-title">Mode Switch Commands <span class="badge-other">Game Flow</span></div>
+
+      <!-- barter / train / combat -->
+      <div class="cmd-card" data-tags="other barter shop store mode">
+        <div class="cmd-header" onclick="toggle(this)">
+          <div class="cmd-header-left">
+            <div class="cmd-signature"><span class="cmd-name">&lt;&lt;barter&gt;&gt;</span> &nbsp;/&nbsp; <span class="cmd-name">&lt;&lt;train&gt;&gt;</span> &nbsp;/&nbsp; <span class="cmd-name">&lt;&lt;combat&gt;&gt;</span></div>
+            <div class="cmd-desc">Exits the dialog and switches to barter, training, or combat mode respectively.</div>
+          </div>
+          <div class="cmd-meta"><span class="return-badge return-void">void</span><span class="chevron">▶</span></div>
+        </div>
+        <div class="cmd-body">
+          <div class="cmd-body-inner">
+            <div class="detail-block">
+              <h4>C# Registration</h4>
+              <div class="code-block"><span class="kw">dialogueRunner</span>.<span class="fn">AddCommandHandler</span>(
+  <span class="str">"barter"</span>,
+  () => GameMode.<span class="fn">EnterBarter</span>()
+);
+<span class="kw">dialogueRunner</span>.<span class="fn">AddCommandHandler</span>(
+  <span class="str">"train"</span>,
+  () => GameMode.<span class="fn">EnterTraining</span>()
+);
+<span class="kw">dialogueRunner</span>.<span class="fn">AddCommandHandler</span>(
+  <span class="str">"combat"</span>,
+  () => GameMode.<span class="fn">EnterCombat</span>()
+);</div>
+            </div>
+            <div class="detail-block">
+              <h4>Yarn Usage</h4>
+              <div class="code-block">"What would you like to buy?"
+<span class="kw">&lt;&lt;barter&gt;&gt;</span>
+
+"Oriana can teach you..."
+<span class="kw">&lt;&lt;train&gt;&gt;</span>
+
+"Enough talk. Fight!"
+<span class="kw">&lt;&lt;combat&gt;&gt;</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- loadmonster -->
+      <div class="cmd-card" data-tags="other combat monster enemy load">
+        <div class="cmd-header" onclick="toggle(this)">
+          <div class="cmd-header-left">
+            <div class="cmd-signature"><span class="cmd-name">&lt;&lt;loadmonster</span> <span class="cmd-param">monsterID</span><span class="cmd-name">&gt;&gt;</span></div>
+            <div class="cmd-desc">Adds a monster to the upcoming combat encounter. Use before &lt;&lt;combat&gt;&gt;. Can be called multiple times to add multiple enemies.</div>
+          </div>
+          <div class="cmd-meta"><span class="return-badge return-void">void</span><span class="chevron">▶</span></div>
+        </div>
+        <div class="cmd-body">
+          <div class="cmd-body-inner">
+            <div class="detail-block">
+              <h4>C# Registration</h4>
+              <div class="code-block"><span class="kw">dialogueRunner</span>.<span class="fn">AddCommandHandler</span>(
+  <span class="str">"loadmonster"</span>,
+  (<span class="param">string</span> monsterId) =>
+    CombatManager.<span class="fn">AddEnemy</span>(monsterId)
+);</div>
+            </div>
+            <div class="detail-block">
+              <h4>Yarn Usage</h4>
+              <div class="code-block"><span class="kw">&lt;&lt;loadmonster</span> <span class="param">ShadowAlaron</span><span class="kw">&gt;&gt;</span>
+<span class="kw">&lt;&lt;loadmonster</span> <span class="param">DarkGuard_01</span><span class="kw">&gt;&gt;</span>
+<span class="kw">&lt;&lt;combat&gt;&gt;</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════ PARTY ═══ -->
+    <div class="section" id="party" data-group="other">
+      <div class="section-title">Party Management Commands <span class="badge-other">Game Flow</span></div>
+
+      <!-- join / unjoin -->
+      <div class="cmd-card" data-tags="other party join unjoin character add remove">
+        <div class="cmd-header" onclick="toggle(this)">
+          <div class="cmd-header-left">
+            <div class="cmd-signature"><span class="cmd-name">&lt;&lt;join</span> <span class="cmd-param">characterName</span><span class="cmd-name">&gt;&gt;</span> &nbsp;/&nbsp; <span class="cmd-name">&lt;&lt;unjoin</span> <span class="cmd-param">characterName</span><span class="cmd-name">&gt;&gt;</span></div>
+            <div class="cmd-desc">Adds or removes a character from the party.</div>
+          </div>
+          <div class="cmd-meta"><span class="return-badge return-void">void</span><span class="chevron">▶</span></div>
+        </div>
+        <div class="cmd-body">
+          <div class="cmd-body-inner">
+            <div class="detail-block">
+              <h4>C# Registration</h4>
+              <div class="code-block"><span class="kw">dialogueRunner</span>.<span class="fn">AddCommandHandler</span>(
+  <span class="str">"join"</span>,
+  (<span class="param">string</span> charName) =>
+    PartyManager.<span class="fn">Add</span>(charName)
+);
+<span class="kw">dialogueRunner</span>.<span class="fn">AddCommandHandler</span>(
+  <span class="str">"unjoin"</span>,
+  (<span class="param">string</span> charName) =>
+    PartyManager.<span class="fn">Remove</span>(charName)
+);</div>
+            </div>
+            <div class="detail-block">
+              <h4>Yarn Usage</h4>
+              <div class="code-block">"I'll join your cause."
+<span class="kw">&lt;&lt;join</span> <span class="param">Oriana</span><span class="kw">&gt;&gt;</span>
+
+"I must go my own way."
+<span class="kw">&lt;&lt;unjoin</span> <span class="param">Dougal</span><span class="kw">&gt;&gt;</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════ SCENE ═══ -->
+    <div class="section" id="scene" data-group="other">
+      <div class="section-title">Scene Setup Commands <span class="badge-other">Game Flow</span></div>
+
+      <!-- setup / start / stage -->
+      <div class="cmd-card" data-tags="other scene setup start stage template scripted">
+        <div class="cmd-header" onclick="toggle(this)">
+          <div class="cmd-header-left">
+            <div class="cmd-signature"><span class="cmd-name">&lt;&lt;setup&gt;&gt;</span> &nbsp;/&nbsp; <span class="cmd-name">&lt;&lt;stage</span> <span class="cmd-param">stageID</span><span class="cmd-name">&gt;&gt;</span> &nbsp;/&nbsp; <span class="cmd-name">&lt;&lt;start&gt;&gt;</span></div>
+            <div class="cmd-desc">Used in scripted dialogs. &lt;&lt;setup&gt;&gt; specifies the scene location, &lt;&lt;stage&gt;&gt; selects a stage template (1–8), and &lt;&lt;start&gt;&gt; begins playback after all initialization is complete.</div>
+          </div>
+          <div class="cmd-meta"><span class="return-badge return-void">void</span><span class="chevron">▶</span></div>
+        </div>
+        <div class="cmd-body">
+          <div class="cmd-body-inner">
+            <div class="detail-block">
+              <h4>C# Registration</h4>
+              <div class="code-block"><span class="kw">dialogueRunner</span>.<span class="fn">AddCommandHandler</span>(
+  <span class="str">"setup"</span>,
+  () => SceneManager.<span class="fn">InitializeScene</span>()
+);
+<span class="kw">dialogueRunner</span>.<span class="fn">AddCommandHandler</span>(
+  <span class="str">"stage"</span>,
+  (<span class="param">int</span> stageId) =>
+    SceneManager.<span class="fn">SetStage</span>(stageId)
+);
+<span class="kw">dialogueRunner</span>.<span class="fn">AddCommandHandler</span>(
+  <span class="str">"start"</span>,
+  () => SceneManager.<span class="fn">BeginPlayback</span>()
+);</div>
+            </div>
+            <div class="detail-block">
+              <h4>Yarn Usage</h4>
+              <div class="code-block"><span class="comment">// Always: setup → stage → place → start</span>
+<span class="kw">&lt;&lt;setup&gt;&gt;</span>
+<span class="kw">&lt;&lt;stage</span> <span class="param">3</span><span class="kw">&gt;&gt;</span>
+<span class="kw">&lt;&lt;focus</span> <span class="param">Ehud</span><span class="kw">&gt;&gt;</span>
+<span class="kw">&lt;&lt;place</span> <span class="param">WP_Center</span><span class="kw">&gt;&gt;</span>
+<span class="kw">&lt;&lt;start&gt;&gt;</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════ MISC ═══ -->
+    <div class="section" id="misc" data-group="other">
+      <div class="section-title">Miscellaneous Commands <span class="badge-other">Game Flow</span></div>
+
+      <div class="deprecated-note">
+        <strong>Deprecated:</strong> The <code>&lt;&lt;cut&gt;&gt;</code>, <code>&lt;&lt;moveLinear&gt;&gt;</code>, <code>&lt;&lt;moveSine&gt;&gt;</code>, and <code>&lt;&lt;position&gt;&gt;</code> camera transition commands from the original system are now replaced by the Pre-Commands at the top of this document. They are listed below for historical reference only.
+      </div>
+
+      <div class="cmd-card" data-tags="other deprecated cut moveLinear moveSine position">
+        <div class="cmd-header" onclick="toggle(this)">
+          <div class="cmd-header-left">
+            <div class="cmd-signature" style="color: var(--text-dim)"><span style="color:var(--text-dim)">&lt;&lt;cut&gt;&gt; &nbsp;/&nbsp; &lt;&lt;moveLinear time&gt;&gt; &nbsp;/&nbsp; &lt;&lt;moveSine&gt;&gt; &nbsp;/&nbsp; &lt;&lt;position wanderpoint&gt;&gt;</span></div>
+            <div class="cmd-desc" style="color:var(--text-dim)">Deprecated. These original camera transition commands are replaced by the Pre-Commands section. Do not use in new scripts.</div>
+          </div>
+          <div class="cmd-meta">
+            <span class="return-badge" style="border-color:var(--text-dim);color:var(--text-dim)">deprecated</span>
+            <span class="chevron">▶</span>
+          </div>
+        </div>
+        <div class="cmd-body">
+          <div class="cmd-body-inner full">
+            <div class="note-block">These commands (cut, moveLinear, moveSine, position) predate the current camera system. They are superseded by <code>&lt;&lt;cutToCamera&gt;&gt;</code>, <code>&lt;&lt;angleTo&gt;&gt;</code>, <code>&lt;&lt;sineTo&gt;&gt;</code>, <code>&lt;&lt;trackon&gt;&gt;</code>, <code>&lt;&lt;speed&gt;&gt;</code>, and the POV variants. All new dialog should use only the Pre-Commands listed at the top of this reference.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="empty-state" class="empty-state" style="display:none">No commands match your search.</div>
+
+  </main>
+</div>
+
+<script>
+function toggle(header) {
+  const body = header.nextElementSibling;
+  const chevron = header.querySelector('.chevron');
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  chevron.classList.toggle('open', !isOpen);
+}
+
+function scrollTo(id) {
+  document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  event.target.closest('.nav-item')?.classList.add('active');
+}
+
+let activeFilter = 'all';
+function setFilter(filter, btn) {
+  activeFilter = filter;
+  document.querySelectorAll('.filter-btn').forEach(b => {
+    b.className = 'filter-btn';
+  });
+  if (filter === 'all') btn.classList.add('active-all');
+  else if (filter === 'camera') btn.classList.add('active-cam');
+  else if (filter === 'variable') btn.classList.add('active-var');
+  else btn.classList.add('active-other');
+  applyFilters();
+}
+
+function filterSearch(query) {
+  applyFilters(query);
+}
+
+function applyFilters(query) {
+  const q = (query !== undefined ? query : document.getElementById('search').value).toLowerCase();
+  let anyVisible = false;
+
+  document.querySelectorAll('.cmd-card').forEach(card => {
+    const tags = (card.dataset.tags || '').toLowerCase();
+    const text = card.textContent.toLowerCase();
+    const group = card.closest('.section')?.dataset.group || '';
+
+    const matchesFilter = activeFilter === 'all' || group === activeFilter;
+    const matchesSearch = !q || tags.includes(q) || text.includes(q);
+    const visible = matchesFilter && matchesSearch;
+
+    card.style.display = visible ? '' : 'none';
+    if (visible) anyVisible = true;
+  });
+
+  document.querySelectorAll('.section').forEach(section => {
+    const group = section.dataset.group || '';
+    const matchesFilter = activeFilter === 'all' || group === activeFilter;
+    const hasVisible = [...section.querySelectorAll('.cmd-card')].some(c => c.style.display !== 'none');
+    section.style.display = (matchesFilter && hasVisible) || (matchesFilter && !q) ? '' : 'none';
+    if (matchesFilter && hasVisible) anyVisible = true;
+  });
+
+  document.getElementById('empty-state').style.display = anyVisible ? 'none' : 'block';
+}
+</script>
+</body>
+</html>
